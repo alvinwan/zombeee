@@ -12,12 +12,15 @@ var map = {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ],
-  "cell": {
-    "padding": 1
-  },
-  "fillStyles": {
-    0: 'rgba(222, 184, 135, 0.25)',
-    1: 'rgba(160, 82, 45, 0.75)'
+  "cells": {
+    0: {
+      "fillStyle": 'rgba(255, 255, 255, 0.1)',
+      "padding": 3,
+    },
+    1: {
+      "fillStyle": 'rgba(255, 255, 255, 0.2)',
+      "padding": 5,
+    }
   }
 }
 
@@ -39,8 +42,6 @@ function setup() {
     canvas.height / map.height);
   map.cell_dimension = cell_dimension
 
-  addZombie(map)
-
   var player = new Player(map);
   window.requestAnimationFrame(function() {
     draw(ctx, map, player)
@@ -55,24 +56,30 @@ function draw(ctx, map, player) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawMap(ctx, map);
   player.draw(ctx);
+  if (Math.random() < 0.02) {
+    addZombie(map)
+  }
   window.requestAnimationFrame(function() {
     draw(ctx, map, player)
   });
 }
 
-function drawCell(x, y, map, ctx) {
+function drawCell(x, y, map, ctx, styles) {
+  if (styles === undefined) {
+    var styles = map.cells[map.grid[y][x]];
+  }
+  ctx.fillStyle = styles.fillStyle;
   ctx.fillRect(
-    map.cell_dimension * x + map.cell.padding,
-    map.cell_dimension * y + map.cell.padding,
-    map.cell_dimension - (map.cell.padding * 2),
-    map.cell_dimension - (map.cell.padding * 2));
+    map.cell_dimension * x + styles.padding,
+    map.cell_dimension * y + styles.padding,
+    map.cell_dimension - (styles.padding * 2),
+    map.cell_dimension - (styles.padding * 2));
 }
 
 function drawMap(ctx, map) {
   ctx.fillStyle = 'rgba(0, 0, 200, 0.25)';
   for (var i = 0; i < map.grid.length; i++) {
     for (var j = 0; j < map.grid[0].length; j++) {
-      ctx.fillStyle = map.fillStyles[map.grid[i][j]]
       drawCell(j, i, map, ctx)
     }
   }
@@ -175,15 +182,20 @@ function Player(map) {
   }
 
   this.draw = function(ctx) {
-    ctx.fillStyle = 'rgba(50, 50, 50, 0.75)';
-    drawCell(this.x, this.y, this.map, ctx);
+    drawCell(this.x, this.y, this.map, ctx,
+            {'fillStyle': 'rgba(255, 255, 255, 1)',
+            'padding': 15});
+    drawCell(this.x, this.y, this.map, ctx,
+            {'fillStyle': 'rgba(255, 255, 255, 0.1)',
+            'padding': 1});
 
-    ctx.fillStyle = 'rgba(50, 50, 50, 0.25)';
-    drawCell(this.x + this.ox, this.y + this.oy, this.map, ctx);
+    drawCell(this.x + this.ox, this.y + this.oy, this.map, ctx,
+            {'fillStyle': 'rgba(255, 255, 255, 0.1)',
+            'padding': 5});
   }
 
   this.shoot = function() {
-    var speed = 10
+    var speed = 30
     var bullet = new Bullet(this.map, this, this.ox * speed, this.oy * speed)
     this.map.bullets.push(bullet)
   }
@@ -205,14 +217,19 @@ function Bullet(map, player, dx, dy) {
     var elapsed = getSeconds() - this.st;
     this.x = this.sx + Math.floor(this.dx * elapsed)
     this.y = this.sy + Math.floor(this.dy * elapsed)
-    ctx.fillStyle = 'rgba(255, 216, 16, 0.75)'
-    drawCell(this.x, this.y, this.map, ctx)
+    drawCell(this.x, this.y, this.map, ctx, {
+      'fillStyle': 'rgba(255, 216, 16, 0.75)',
+      'padding': 20
+    })
 
-    ctx.fillStyle = 'rgba(255, 216, 16, 0.15)'
-    drawCell(this.x, this.y + 1, this.map, ctx)
-    drawCell(this.x, this.y - 1, this.map, ctx)
-    drawCell(this.x + 1, this.y, this.map, ctx)
-    drawCell(this.x - 1, this.y, this.map, ctx)
+    var style = {
+      'fillStyle': 'rgba(255, 216, 16, 0.15)',
+      'padding': 1
+    }
+    drawCell(this.x, this.y + 1, this.map, ctx, style)
+    drawCell(this.x, this.y - 1, this.map, ctx, style)
+    drawCell(this.x + 1, this.y, this.map, ctx, style)
+    drawCell(this.x - 1, this.y, this.map, ctx, style)
   }
 
   this.deleteme = function() {
@@ -237,8 +254,14 @@ function Zombie(map, sx, sy, dx, dy) {
     var elapsed = getSeconds() - this.st;
     this.x = this.sx + Math.floor(this.dx * elapsed)
     this.y = this.sy + Math.floor(this.dy * elapsed)
-    ctx.fillStyle = 'rgba(224, 53, 26, 0.75)'
-    drawCell(this.x, this.y, this.map, ctx)
+    drawCell(this.x, this.y, this.map, ctx, {
+      'fillStyle': 'rgba(244, 72, 66, 0.25)',
+      'padding': 1
+    })
+    drawCell(this.x, this.y, this.map, ctx, {
+      'fillStyle': 'rgba(244, 72, 66, 1)',
+      'padding': 15
+    })
   }
 }
 
