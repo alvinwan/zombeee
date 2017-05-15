@@ -26,7 +26,7 @@ var map = {
 
 function setup() {
   var canvas = document.getElementById('canvas');
-  canvas_dim = Math.min(document.body.clientWidth, document.body.clientHeight)
+  canvas_dim = Math.min(document.body.clientWidth, document.body.clientHeight);
   canvas.width = canvas_dim;
   canvas.height = canvas_dim;
 

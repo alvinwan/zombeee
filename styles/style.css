@@ -1,0 +1,139 @@
+body {
+  font-family:'Open Sans'
+}
+body, canvas {
+  background-color:#333;
+  padding: 0;
+  margin: 0;
+}
+body {
+  text-align:center;
+}
+canvas {
+  float:none;
+  display:inline-block;
+}
+#display {
+  display:none;
+}
+.stats {
+  position:absolute;
+  top:0;
+  left:0;
+  width:5em;
+  height:100%;
+  background-color:#222;
+}
+.stats ul {
+  padding:0;
+  margin:1em 0 0 0;
+}
+.stats li {
+  width:4.5em;
+  height:4.5em;
+  margin:0.25em;
+  padding:1em;
+  box-sizing:border-box;
+  list-style:none;
+  float:left;
+  position:relative;
+}
+.stats span {
+  text-align:center;
+  font-size:1.5em;
+  margin-top:-0.25em;
+  display:inline-block;
+  color:#FFF;
+}
+.stats label {
+  text-transform:uppercase;
+  font-weight:600;
+  font-size:0.35em;
+  letter-spacing:0.2em;
+  color:#666;
+  position:absolute;
+  bottom:1.25em;
+  left:50%;
+  transform: translateX(-50%);
+}
+.stats h1 {
+  text-transform:uppercase;
+  color:#FFF;
+  font-size:0.6em;
+  letter-spacing:0.75em;
+  position:absolute;
+  left:50%;
+  transform: translateX(-50%) rotate(-90deg);
+  bottom:17.5em;
+  width:32.5em;
+  display:inline-block;
+}
+
+.stats h1 span, .stats h1 a {
+  text-decoration:none;
+  display:inline-block;
+  color:#666;
+  font-weight:300;
+  font-size:0.95em;
+  letter-spacing: 0.25em;
+}
+
+#display h1 {
+  font-size:1.5em;
+  letter-spacing:1em;
+  text-transform:uppercase;
+  color:#ccc;
+}
+
+#display h2 {
+  color:#666;
+  font-size:1em;
+  letter-spacing:0.5em;
+  text-transform:uppercase;
+}
+
+#display .button {
+  margin-top:3em;
+  border:1px solid #999;
+  background-color:rgba(255,255,255,0.05);
+  padding:1.5em 3em;
+  color:#ccc;
+  display:inline-block;
+  text-decoration:none;
+  text-transform:uppercase;
+  font-size:0.75em;
+  letter-spacing:0.5em;
+}
+
+#display .button:hover {
+  color:#FFF;
+  border:1px solid #FFF;
+}
+
+#display .center {
+  padding:6em 3em;
+}
+
+.authorship {
+  position:absolute;
+  bottom:0;
+  right:0;
+  background-color:#222;
+  z-index:100;
+  text-transform:uppercase;
+  color:#999;
+  letter-spacing:0.35em;
+  padding:1em 2em 1em 3em;
+  font-size:0.65em;
+}
+
+.authorship a {
+  color:#999;
+  border-bottom:1px dotted #999;
+  text-decoration:none;
+}
+
+.authorship a:hover {
+  color:#ccc;
+  border-bottom:1px solid #ccc;
+}
