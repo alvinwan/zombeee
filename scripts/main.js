@@ -46,6 +46,7 @@ function newGame(map) {
   document.getElementById('game').style.display = 'block'
   document.getElementById('display').style.display = 'none'
   document.getElementById('lives').innerHTML = 3
+  document.getElementById('score').innerHTML = 0
 
   map.bullets = []
   map.zombies = []
@@ -256,6 +257,11 @@ function Player(map) {
     document.getElementById('lives').innerHTML = this.life;
   }
 
+  this.addpoints = function(points) {
+    this.points += points;
+    document.getElementById('score').innerHTML = this.points;
+  }
+
   this.shoulddestroy = function() {
     return this.life <= 0
   }
@@ -304,13 +310,10 @@ function Bullet(map, player, dx, dy) {
   }
 
   this.update = function() {
-    if (this.shoulddestroy()) {
-      this.ondestroy();
-    }
   }
 
   this.ondestroy = function() {
-    this.player.points += 1
+    this.player.addpoints(1);
   }
 }
 
