@@ -14,10 +14,22 @@
       float:none;
       display:inline-block;
     }
+    #display {
+      display:none;
+    }
     </style>
   </head>
   <body>
+    <section id="game">
+    <div class="stats">
+      <p id="lives">3</p>
+    </div>
     <canvas id="canvas" width="500" height="500">
     </canvas>
+    </section>
+    <section id="display">
+      <h1>game over</h1>
+      <a href="#" onclick="newGame(map)">try again</a>
+    </section>
   </body>
 </html>

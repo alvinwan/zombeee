@@ -14,7 +14,7 @@ var map = {
   ],
   "cells": {
     0: {
-      "fillStyle": 'rgba(255, 255, 255, 0.1)',
+      "fillStyle": 'rgba(255, 255, 255, 0.01)',
       "padding": 3,
     },
     1: {
@@ -30,10 +30,26 @@ function setup() {
   canvas.width = canvas_dim;
   canvas.height = canvas_dim;
 
+  newGame(map)
+
   var ctx = canvas.getContext('2d');
+  window.requestAnimationFrame(function() {
+    draw(ctx, map)
+  });
+
+  window.onkeypress = function (keyEvent) {
+    map.players[0].onkeypress(keyEvent)
+  }
+}
+
+function newGame(map) {
+  document.getElementById('game').style.display = 'block'
+  document.getElementById('display').style.display = 'none'
+  document.getElementById('lives').innerHTML = 3
 
   map.bullets = []
   map.zombies = []
+  map.players = []
   map.width = map.grid[0].length
   map.height = map.grid.length
 
@@ -43,24 +59,18 @@ function setup() {
   map.cell_dimension = cell_dimension
 
   var player = new Player(map);
-  window.requestAnimationFrame(function() {
-    draw(ctx, map, player)
-  });
-
-  window.onkeypress = function (keyEvent) {
-    player.onkeypress(keyEvent)
-  }
+  player.current = true
+  map.players.push(player);
 }
 
-function draw(ctx, map, player) {
+function draw(ctx, map) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawMap(ctx, map);
-  player.draw(ctx);
-  if (Math.random() < 0.02) {
-    addZombie(map)
-  }
+  drawBullets(ctx, map.bullets);
+  drawZombies(ctx, map.zombies);
+  drawPlayers(ctx, map.players);
   window.requestAnimationFrame(function() {
-    draw(ctx, map, player)
+    draw(ctx, map)
   });
 }
 
@@ -76,26 +86,47 @@ function drawCell(x, y, map, ctx, styles) {
     map.cell_dimension - (styles.padding * 2));
 }
 
+function drawZombies(ctx, zombies) {
+  if (Math.random() < 0.02) {
+    addZombie(map)
+  }
+  for (var i = 0; i < zombies.length; i++) {
+    var zombie = zombies[i];
+    zombie.update();
+    if (zombie.shoulddestroy()) {
+      zombies.splice(i, 1);
+      zombie.ondestroy();
+    }
+    zombie.draw(ctx);
+  }
+}
+
+function drawBullets(ctx, bullets) {
+  for (var i = 0; i < bullets.length; i++) {
+    var bullet = bullets[i];
+    bullet.update();
+    bullet.draw(ctx);
+  }
+}
+
+function drawPlayers(ctx, players) {
+  for (var i = 0; i < players.length; i++) {
+    var player = players[i];
+    player.update();
+    player.draw(ctx);
+    if (player.shoulddestroy()) {
+      players.splice(i, 1)
+      player.ondestroy()
+    }
+  }
+}
+
 function drawMap(ctx, map) {
   ctx.fillStyle = 'rgba(0, 0, 200, 0.25)';
   for (var i = 0; i < map.grid.length; i++) {
     for (var j = 0; j < map.grid[0].length; j++) {
       drawCell(j, i, map, ctx)
     }
-  }
-  for (var i = 0; i < map.bullets.length; i++) {
-    var bullet = map.bullets[i];
-    bullet.update();
-    bullet.draw(ctx);
-  }
-  for (var i = 0; i < map.zombies.length; i++) {
-    var zombie = map.zombies[i];
-    zombie.update();
-    if (zombie.shoulddestroy()) {
-      map.zombies.splice(i, 1);
-      zombie.ondestroy();
-    }
-    zombie.draw(ctx);
   }
 }
 
@@ -105,7 +136,10 @@ function Player(map) {
   this.y = 1
   this.ox = 1
   this.oy = 0
+  this.life = 3
   this.map = map
+  this.points = 0
+  this.current = false
 
   this.onkeypress = function(keyEvent) {
     var charCode = String.fromCharCode(keyEvent.charCode);
@@ -187,6 +221,17 @@ function Player(map) {
     }
   }
 
+  this.update = function() {
+    for (var i = 0; i < map.zombies.length; i++) {
+      var zombie = map.zombies[i];
+      if (collide(zombie, this)) {
+        this.loselife(1);
+        map.zombies.splice(i, 1)
+        zombie.ondestroy()
+      }
+    }
+  }
+
   this.draw = function(ctx) {
     drawCell(this.x, this.y, this.map, ctx,
             {'fillStyle': 'rgba(255, 255, 255, 1)',
@@ -204,6 +249,21 @@ function Player(map) {
     var speed = 30
     var bullet = new Bullet(this.map, this, this.ox * speed, this.oy * speed)
     this.map.bullets.push(bullet)
+  }
+
+  this.loselife = function(damage) {
+    this.life -= damage
+    document.getElementById('lives').innerHTML = this.life;
+  }
+
+  this.shoulddestroy = function() {
+    return this.life <= 0
+  }
+
+  this.ondestroy = function() {
+    if (this.current) {
+      gameOver()
+    }
   }
 }
 
@@ -250,7 +310,7 @@ function Bullet(map, player, dx, dy) {
   }
 
   this.ondestroy = function() {
-
+    this.player.points += 1
   }
 }
 
@@ -284,7 +344,7 @@ function Zombie(map, sx, sy, dx, dy) {
       }
     }
     drawCell(this.x, this.y, this.map, ctx, {
-      'fillStyle': 'rgba(244, 72, 66, 0.25)',
+      'fillStyle': 'rgba(244, 72, 66, 0.15)',
       'padding': 1
     })
     drawCell(this.x, this.y, this.map, ctx, {
@@ -343,6 +403,11 @@ function addZombie(map) {
 
 function getSeconds() {
   return new Date().getTime() / 1000;
+}
+
+function gameOver() {
+  document.getElementById('game').style.display = 'none'
+  document.getElementById('display').style.display = 'block'
 }
 
 window.onload = function() {
