@@ -7,13 +7,19 @@
   </head>
   <body>
     <section id="game">
-    <canvas id="canvas" width="500" height="500">
-    </canvas>
+      <canvas id="canvas" width="500" height="500"></canvas>
     </section>
-    <section id="display">
+    <section class="display" id="start">
+      <div class="center">
+        <h1>Welcome</h1>
+        <h2>Ready for some zombeee butt-kicking?</h2>
+        <a href="#" class="button" onclick="newGame(map)">Get Started</a>
+      </div>
+    </section>
+    <section class="display" id="gameover">
       <div class="center">
         <h1>Game Over</h1>
-        <h2>Better luck next time?</h2>
+        <h2>Better luck next time</h2>
         <a href="#" class="button" onclick="newGame(map)">Try Again</a>
       </div>
     </section>

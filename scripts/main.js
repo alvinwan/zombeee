@@ -21,7 +21,10 @@ var map = {
       "fillStyle": 'rgba(255, 255, 255, 0.2)',
       "padding": 5,
     }
-  }
+  },
+  "bullets": [],
+  "zombies": [],
+  "players": []
 }
 
 function setup() {
@@ -29,25 +32,22 @@ function setup() {
   canvas_dim = Math.min(document.body.clientWidth, document.body.clientHeight);
   canvas.width = canvas_dim;
   canvas.height = canvas_dim;
-
-  newGame(map)
+  map.pause = true
 
   var ctx = canvas.getContext('2d');
   window.requestAnimationFrame(function() {
     draw(ctx, map)
   });
-
-  window.onkeypress = function (keyEvent) {
-    map.players[0].onkeypress(keyEvent)
-  }
 }
 
 function newGame(map) {
   document.getElementById('game').style.display = 'block'
-  document.getElementById('display').style.display = 'none'
+  document.getElementById('gameover').style.display = 'none'
+  document.getElementById('start').style.display = 'none'
   document.getElementById('lives').innerHTML = 3
   document.getElementById('score').innerHTML = 0
 
+  map.pause = false
   map.bullets = []
   map.zombies = []
   map.players = []
@@ -62,14 +62,20 @@ function newGame(map) {
   var player = new Player(map);
   player.current = true
   map.players.push(player);
+
+  window.onkeydown = function (keyEvent) {
+    player.onkeydown(keyEvent);
+  }
 }
 
 function draw(ctx, map) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawMap(ctx, map);
-  drawBullets(ctx, map.bullets);
-  drawZombies(ctx, map.zombies);
-  drawPlayers(ctx, map.players);
+  if (!map.pause) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawMap(ctx, map);
+    drawBullets(ctx, map.bullets);
+    drawZombies(ctx, map.zombies);
+    drawPlayers(ctx, map.players);
+  }
   window.requestAnimationFrame(function() {
     draw(ctx, map)
   });
@@ -142,9 +148,27 @@ function Player(map) {
   this.points = 0
   this.current = false
 
-  this.onkeypress = function(keyEvent) {
-    var charCode = String.fromCharCode(keyEvent.charCode);
-    switch(keyEvent) {
+  this.onkeydown = function(keyEvent) {
+    switch(keyEvent.keyCode) {
+      case 37:
+      case 65:
+        charCode = "a"
+        break;
+      case 38:
+      case 87:
+        charCode = "w"
+        break;
+      case 39:
+      case 68:
+        charCode = "d"
+        break;
+      case 40:
+      case 83:
+        charCode = "s"
+        break;
+      case 88:
+        charCode = "x"
+        break;
       case 32:
         charCode = "space"
         break;
@@ -410,7 +434,7 @@ function getSeconds() {
 
 function gameOver() {
   document.getElementById('game').style.display = 'none'
-  document.getElementById('display').style.display = 'block'
+  document.getElementById('gameover').style.display = 'block'
 }
 
 window.onload = function() {

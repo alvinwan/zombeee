@@ -13,7 +13,7 @@ canvas {
   float:none;
   display:inline-block;
 }
-#display {
+#gameover, #game {
   display:none;
 }
 .stats {
@@ -78,23 +78,23 @@ canvas {
   letter-spacing: 0.25em;
 }
 
-#display h1 {
+.display h1 {
   font-size:1.5em;
   letter-spacing:1em;
   text-transform:uppercase;
   color:#ccc;
 }
 
-#display h2 {
+.display h2 {
   color:#666;
   font-size:1em;
   letter-spacing:0.5em;
   text-transform:uppercase;
+  font-weight:300;
 }
 
-#display .button {
+.display .button {
   margin-top:3em;
-  border:1px solid #999;
   background-color:rgba(255,255,255,0.05);
   padding:1.5em 3em;
   color:#ccc;
@@ -105,13 +105,12 @@ canvas {
   letter-spacing:0.5em;
 }
 
-#display .button:hover {
+.display .button:hover {
   color:#FFF;
-  border:1px solid #FFF;
 }
 
-#display .center {
-  padding:6em 3em;
+.display .center {
+  padding:15% 3em;
 }
 
 .authorship {
