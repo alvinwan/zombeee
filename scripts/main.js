@@ -85,10 +85,16 @@ function drawMap(ctx, map) {
   }
   for (var i = 0; i < map.bullets.length; i++) {
     var bullet = map.bullets[i];
+    bullet.update();
     bullet.draw(ctx);
   }
   for (var i = 0; i < map.zombies.length; i++) {
     var zombie = map.zombies[i];
+    zombie.update();
+    if (zombie.shoulddestroy()) {
+      map.zombies.splice(i, 1);
+      zombie.ondestroy();
+    }
     zombie.draw(ctx);
   }
 }
@@ -212,6 +218,7 @@ function Bullet(map, player, dx, dy) {
   this.x = this.sx
   this.y = this.sy
   this.st = getSeconds()
+  this.damage = 1
 
   this.draw = function(ctx) {
     var elapsed = getSeconds() - this.st;
@@ -232,9 +239,18 @@ function Bullet(map, player, dx, dy) {
     drawCell(this.x - 1, this.y, this.map, ctx, style)
   }
 
-  this.deleteme = function() {
-    return (this.x < 0 || this.y < 0 || this.x > map.width ||
-            this.y > map.height);
+  this.shoulddestroy = function() {
+    return isoffscreen(this.x, this.y, this.map);
+  }
+
+  this.update = function() {
+    if (this.shoulddestroy()) {
+      this.ondestroy();
+    }
+  }
+
+  this.ondestroy = function() {
+
   }
 }
 
@@ -263,6 +279,37 @@ function Zombie(map, sx, sy, dx, dy) {
       'padding': 15
     })
   }
+
+  this.loseLife = function(damage) {
+    this.life -= damage;
+  }
+
+  this.update = function() {
+    for (var i = 0; i < map.bullets.length; i++) {
+      var bullet = map.bullets[i];
+      if (collide(bullet, this)) {
+        this.life -= bullet.damage;
+        map.bullets.splice(i, 1);
+        bullet.ondestroy();
+      }
+    }
+  }
+
+  this.shoulddestroy = function() {
+    return (this.life <= 0 || isoffscreen(this.x, this.y, this.map))
+  }
+
+  this.ondestroy = function() {
+
+  }
+}
+
+function collide(obj1, obj2) {
+  return (obj1.x == obj2.x && obj1.y == obj2.y)
+}
+
+function isoffscreen(x, y, map) {
+  return (x < 0 || y < 0 || x > map.width || y > map.height);
 }
 
 function addZombie(map) {
