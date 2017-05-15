@@ -213,8 +213,8 @@ function Bullet(map, player, dx, dy) {
   this.player = player
   this.dx = dx
   this.dy = dy
-  this.sx = player.x + player.ox
-  this.sy = player.y + player.oy
+  this.sx = player.x
+  this.sy = player.y
   this.x = this.sx
   this.y = this.sy
   this.st = getSeconds()
@@ -264,12 +264,25 @@ function Zombie(map, sx, sy, dx, dy) {
   this.x = this.sx
   this.y = this.sy
   this.st = getSeconds()
+  this.t = this.st
   this.life = 1
 
+  // TODO(Alvin): Zombies may go through walls if dx is more than 1
   this.draw = function(ctx) {
-    var elapsed = getSeconds() - this.st;
-    this.x = this.sx + Math.floor(this.dx * elapsed)
-    this.y = this.sy + Math.floor(this.dy * elapsed)
+    var elapsed = getSeconds() - this.t;
+    var dx = Math.floor(this.dx * elapsed)
+    var dy = Math.floor(this.dy * elapsed)
+    var nx = this.x + dx
+    var ny = this.y + dy
+    if (dx > 0 || dy > 0) {
+      if (!isoffscreen(nx, ny, this.map) && this.map.grid[ny][nx] > 0) {
+        this.t += elapsed
+      } else {
+        this.t += elapsed
+        this.x = nx
+        this.y = ny
+      }
+    }
     drawCell(this.x, this.y, this.map, ctx, {
       'fillStyle': 'rgba(244, 72, 66, 0.25)',
       'padding': 1
@@ -309,7 +322,7 @@ function collide(obj1, obj2) {
 }
 
 function isoffscreen(x, y, map) {
-  return (x < 0 || y < 0 || x > map.width || y > map.height);
+  return (x < 0 || y < 0 || x >= map.width || y >= map.height);
 }
 
 function addZombie(map) {
